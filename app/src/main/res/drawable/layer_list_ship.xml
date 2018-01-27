@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+
+
+
+    <!--<item android:drawable="@drawable/ic_emty_circular"-->
+
+    <!--android:gravity="center"/>-->
+
+    <item>
+        <shape xmlns:android="http://schemas.android.com/apk/res/android"
+            android:shape="oval">
+            <solid
+                android:color="#b3b7b9"/>
+        </shape>
+
+    </item>
+
+
+
+    <item android:drawable="@drawable/ic_ship_24dp"
+        android:top="5dp" android:bottom="5dp"
+        android:right="5dp" android:left="5dp"
+        android:gravity="center"/>
+</layer-list>

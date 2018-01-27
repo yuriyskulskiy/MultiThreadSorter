@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Multithreading Sorter</string>
+    <string name="start_activity_name">Sorted Data Display</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="left_tab_title">Task 1</string>
+    <string name="middle_tab_title">Task 2</string>
+    <string name="right_tab_title">Task 3</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="time">Δ time(nano)</string>
+    <string name="position_before_sort">Before  sort</string>
+    <string name="bubble_sort_method">Bubble sort method</string>
+    <string name="no_data_to_show">NO DATA To SHOW</string>
+</resources>
