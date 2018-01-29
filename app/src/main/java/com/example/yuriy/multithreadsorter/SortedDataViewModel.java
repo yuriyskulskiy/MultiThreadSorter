@@ -7,22 +7,22 @@ import android.arch.lifecycle.ViewModel;
 
 
 import com.example.yuriy.multithreadsorter.model.Mechanizm;
-import com.example.yuriy.multithreadsorter.service.manager.AdvancedTimeLinkedList;
+import com.example.yuriy.multithreadsorter.service.manager.AdvancedDataLinkedList;
 
 import java.util.List;
 
 public class SortedDataViewModel extends ViewModel {
-    private MutableLiveData<List<AdvancedTimeLinkedList<Mechanizm>>> loadedSortedData;
+    private MutableLiveData<List<AdvancedDataLinkedList<Mechanizm>>> loadedSortedData;
 
 
-    public LiveData<List<AdvancedTimeLinkedList<Mechanizm>>> getLoadedSortedData() {
+    public LiveData<List<AdvancedDataLinkedList<Mechanizm>>> getLoadedSortedData() {
         if (loadedSortedData == null) {
-            loadedSortedData = new MutableLiveData<List<AdvancedTimeLinkedList<Mechanizm>>>();
+            loadedSortedData = new MutableLiveData<List<AdvancedDataLinkedList<Mechanizm>>>();
         }
         return loadedSortedData;
     }
     //use this method only from the main thread   (Thread.currentThread() == Looper.getMainLooper().getThread()) = true
-    public void saveSortedDataToVM(List<AdvancedTimeLinkedList<Mechanizm>> newSortedData) {
+    public void saveSortedDataToVM(List<AdvancedDataLinkedList<Mechanizm>> newSortedData) {
         loadedSortedData.setValue(newSortedData);
     }
 }

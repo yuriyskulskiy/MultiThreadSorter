@@ -16,13 +16,17 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.yuriy.multithreadsorter.incommingData.TaskGeneratorImpl;
 import com.example.yuriy.multithreadsorter.model.Mechanizm;
+import com.example.yuriy.multithreadsorter.prefferences.SharedPreferencesProvider;
 import com.example.yuriy.multithreadsorter.receiver.LocalBroadcastReceiver;
 import com.example.yuriy.multithreadsorter.service.MultiSortingIntentService;
-import com.example.yuriy.multithreadsorter.service.manager.AdvancedTimeLinkedList;
+import com.example.yuriy.multithreadsorter.service.manager.AdvancedDataLinkedList;
 
 import java.util.List;
 
@@ -37,13 +41,15 @@ public class StartActivity extends AppCompatActivity {
     private DataRecyclerViewAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private TextView noDataTv;
-    List<AdvancedTimeLinkedList<Mechanizm>> sortedTmpData = null;
+    List<AdvancedDataLinkedList<Mechanizm>> sortedTmpData = null;
 
     private LocalBroadcastReceiver sortedDataReceiver =
             new LocalBroadcastReceiver(Constants.BROADCAST_SORT_ACTION) {
                 @Override
                 public void onReceive(Context context, Intent intent) {
-                    List<AdvancedTimeLinkedList<Mechanizm>> sortedMultiTaskData = (List<AdvancedTimeLinkedList<Mechanizm>>) intent.getSerializableExtra(Constants.RESULT_SORTED_DATA);
+                    List<AdvancedDataLinkedList<Mechanizm>> sortedMultiTaskData =
+                            (List<AdvancedDataLinkedList<Mechanizm>>)
+                                    intent.getSerializableExtra(Constants.RESULT_SORTED_DATA);
 
                     getViewModel().saveSortedDataToVM(sortedMultiTaskData);
 
@@ -61,7 +67,7 @@ public class StartActivity extends AppCompatActivity {
             noDataTv.setVisibility(View.VISIBLE);
             return;
         }
-        AdvancedTimeLinkedList<Mechanizm> dataToDisplay = sortedTmpData.get(activeTab);
+        AdvancedDataLinkedList<Mechanizm> dataToDisplay = sortedTmpData.get(activeTab);
 
         if (dataToDisplay == null || dataToDisplay.size() == 0) {
             //single task was null or has zero size
@@ -106,21 +112,20 @@ public class StartActivity extends AppCompatActivity {
     };
 
 
-    public SortedDataViewModel getViewModel() {
-        return ViewModelProviders.of(this).get(SortedDataViewModel.class);
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        initSpinner(savedInstanceState);
+
         noDataTv = findViewById(R.id.tv_empty_data);
         noDataTv.setVisibility(View.VISIBLE);
-        getViewModel().getLoadedSortedData().observe(this, new Observer<List<AdvancedTimeLinkedList<Mechanizm>>>() {
+        getViewModel().getLoadedSortedData().observe(this, new Observer<List<AdvancedDataLinkedList<Mechanizm>>>() {
             @Override
-            public void onChanged(@Nullable List<AdvancedTimeLinkedList<Mechanizm>> lists) {
+            public void onChanged(@Nullable List<AdvancedDataLinkedList<Mechanizm>> lists) {
                 sortedTmpData = lists;
                 refreshAdapter(mActiveTab);
 
@@ -165,6 +170,39 @@ public class StartActivity extends AppCompatActivity {
 
     }
 
+    private void initSpinner(Bundle bundle) {
+        Spinner spinner = (Spinner) findViewById(R.id.spinner_sort_method);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+//                R.array.sort_type, android.R.layout.simple_spinner_item);
+                R.array.sort_type, R.layout.spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+
+        final SharedPreferencesProvider preferencesProvider = new SharedPreferencesProvider();
+        if (bundle == null) {
+            //bundle can be null only when app is being just started (not screen rotation)
+            int sortingMethodType = preferencesProvider.getSelectedSortType(this);
+            spinner.setSelection(sortingMethodType);
+        }
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                preferencesProvider.saveSortType(position, StartActivity.this);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+
+    }
+
+    public SortedDataViewModel getViewModel() {
+        return ViewModelProviders.of(this).get(SortedDataViewModel.class);
+    }
+
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
@@ -176,7 +214,7 @@ public class StartActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_start, menu);
         return true;
     }
-   //todo implement possibility change sorting type
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -206,4 +244,5 @@ public class StartActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         outState.putInt(ACTIVE_TAB_EXTRA, mActiveTab);
     }
+
 }

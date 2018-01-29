@@ -4,7 +4,9 @@ package com.example.yuriy.multithreadsorter.service.manager;
 import android.util.Log;
 
 import com.example.yuriy.multithreadsorter.model.Mechanizm;
-import com.example.yuriy.multithreadsorter.sortUtils.MechanizmSorter;
+import com.example.yuriy.multithreadsorter.sortUtils.BaseSortedClass;
+import com.example.yuriy.multithreadsorter.sortUtils.BubbleSort;
+import com.example.yuriy.multithreadsorter.sortUtils.QuickSort;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,6 +18,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import static com.example.yuriy.multithreadsorter.Constants.BUBBLE_SORT_TYPE;
+import static com.example.yuriy.multithreadsorter.Constants.QUICK_SORT_TYPE;
+
 class TaskExecutor {
 
     private static final int THREAD_POOL_SIZE = 3;
@@ -24,32 +29,50 @@ class TaskExecutor {
     }
 
 
-    public static void executeMultiTask(Mechanizm[][] mulyTaskData, ThreadManager.ThreadManagerCallback callback) {
+    public static void executeMultiTask(Mechanizm[][] mulyTaskData,
+                                        ThreadManager.ThreadManagerCallback callback,
+                                        final int selectedSortType) {
 
         //define tasks callable list
-        List<Callable<AdvancedTimeLinkedList<Mechanizm>>> tasks = new ArrayList<>();
+        List<Callable<AdvancedDataLinkedList<Mechanizm>>> tasks = new ArrayList<>();
         for (final Mechanizm[] singletaskData : mulyTaskData) {
 
 
-            Callable<AdvancedTimeLinkedList<Mechanizm>> callable = new Callable<AdvancedTimeLinkedList<Mechanizm>>() {
+            Callable<AdvancedDataLinkedList<Mechanizm>> callable = new Callable<AdvancedDataLinkedList<Mechanizm>>() {
                 @Override
-                public AdvancedTimeLinkedList<Mechanizm> call() throws Exception {
+                public AdvancedDataLinkedList<Mechanizm> call() throws Exception {
 //                    int k = new Random().nextInt(5);
 //                    int additionTaskTime = 1000 * k;
 //                    Log.w("TaskExecutor", "taskTime =" + additionTaskTime);
+                    BaseSortedClass<Mechanizm> sortExecutor;
+                    switch (selectedSortType) {
+                        case BUBBLE_SORT_TYPE:
+                            sortExecutor = new BubbleSort();
+                            break;
+                        case QUICK_SORT_TYPE:
+                            sortExecutor = new QuickSort();
+                            break;
+                        default:
+                            throw new UnsupportedOperationException();
+                    }
+                    //get sort type switch
+
+//                    BaseSortedClass<Mechanizm> sortExecutor = new BubbleSort();
+//                    BaseSortedClass<Mechanizm> sortExecutor = new QuickSort();
 
                     //start
                     long lStartTime = System.nanoTime();
-                    Mechanizm[] sortedDataArr = new MechanizmSorter().sort(singletaskData);
+                    Mechanizm[] sortedDataArr = sortExecutor.sort(singletaskData);
                     //end
                     long lEndTime = System.nanoTime();
                     long sortTime = lEndTime - lStartTime; // nano seconds
                     Log.e("TaskExecutor", "sort_time =" + sortTime);
 //                   "Elapsed time in milliseconds: " + output / 1000000);
                     //                    Thread.sleep(additionTaskTime);
-                    AdvancedTimeLinkedList<Mechanizm> sortedData =
-                            new AdvancedTimeLinkedList<Mechanizm>(Arrays.asList(sortedDataArr));
+                    AdvancedDataLinkedList<Mechanizm> sortedData =
+                            new AdvancedDataLinkedList<Mechanizm>(Arrays.asList(sortedDataArr));
                     sortedData.setSortingDeltaTime(sortTime);
+                    sortedData.setSortingTypeMethod(selectedSortType);
                     return sortedData;
                 }
             };
@@ -58,11 +81,11 @@ class TaskExecutor {
         }
 
         ExecutorService exec = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
-        List<AdvancedTimeLinkedList<Mechanizm>> resultSortedData = new LinkedList<>();
+        List<AdvancedDataLinkedList<Mechanizm>> resultSortedData = new LinkedList<>();
         try {
-            List<Future<AdvancedTimeLinkedList<Mechanizm>>> results = exec.invokeAll(tasks);
-            for (Future<AdvancedTimeLinkedList<Mechanizm>> future : results) {
-                AdvancedTimeLinkedList<Mechanizm> sortedSingleData = future.get();
+            List<Future<AdvancedDataLinkedList<Mechanizm>>> results = exec.invokeAll(tasks);
+            for (Future<AdvancedDataLinkedList<Mechanizm>> future : results) {
+                AdvancedDataLinkedList<Mechanizm> sortedSingleData = future.get();
                 resultSortedData.add(sortedSingleData);
                 for (Mechanizm mechanizm : sortedSingleData) {
                     Log.w("TaskExecutor", mechanizm.getName() + "id = " + mechanizm.getId());

@@ -11,19 +11,16 @@ import android.widget.TextView;
 
 import com.example.yuriy.multithreadsorter.model.Mechanizm;
 import com.example.yuriy.multithreadsorter.model.TypesConstants;
-import com.example.yuriy.multithreadsorter.service.manager.AdvancedTimeLinkedList;
-
-
+import com.example.yuriy.multithreadsorter.service.manager.AdvancedDataLinkedList;
 
 
 public class DataRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final int TYPE_HEADER = 0;
     private static final int TYPE_ITEM = 1;
-    private AdvancedTimeLinkedList<Mechanizm> mDataset;
+    private AdvancedDataLinkedList<Mechanizm> mDataset;
 
 
-
-    public DataRecyclerViewAdapter(AdvancedTimeLinkedList<Mechanizm> myDataset) {
+    public DataRecyclerViewAdapter(AdvancedDataLinkedList<Mechanizm> myDataset) {
         mDataset = myDataset;
     }
 
@@ -67,7 +64,7 @@ public class DataRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
     }
 
 
-    public void updateData(AdvancedTimeLinkedList<Mechanizm> dataset) {
+    public void updateData(AdvancedDataLinkedList<Mechanizm> dataset) {
 //        mDataset.clear();  dont clear cause this is ref to tmp global multi data to reuse
         mDataset = (dataset);
 
@@ -81,6 +78,7 @@ public class DataRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
         if (holder instanceof HeaderViewHolder) {
             HeaderViewHolder headerholder = (HeaderViewHolder) holder;
 
+            headerholder.mSortTypeMethod.setText(mDataset.extractSortingTypeName());
             headerholder.mSortTime.setText(String.valueOf(mDataset.getSortingDeltaTime()));
             headerholder.mMechanizmTypeTextView.setText(mDataset.get(0).getMechanizmType());
         } else if (holder instanceof ItemViewHolder) {
@@ -116,9 +114,11 @@ public class DataRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         TextView mMechanizmTypeTextView;
         TextView mSortTime;
+        TextView mSortTypeMethod;
 
         public HeaderViewHolder(View itemView) {
             super(itemView);
+            mSortTypeMethod = itemView.findViewById(R.id.tv_sort_method);
             mMechanizmTypeTextView = itemView.findViewById(R.id.tv_mech_type);
             mSortTime = itemView.findViewById(R.id.tv_delta_time_value);
         }

@@ -5,7 +5,6 @@ import com.example.yuriy.multithreadsorter.model.Mechanizm;
 import java.util.List;
 
 
-
 public class ThreadManager {
     Mechanizm[][] multiTaskData;
     Mechanizm[] firstTaskData;
@@ -20,12 +19,12 @@ public class ThreadManager {
         return new ThreadManager().new Builder();
     }
 
-    public void executeMultiTask() {
-        TaskExecutor.executeMultiTask(multiTaskData, callback);
+    public void executeMultiTask(int sortTypeMethod) {
+        TaskExecutor.executeMultiTask(multiTaskData, callback, sortTypeMethod);
     }
 
     public interface ThreadManagerCallback {
-        void onMultiTaskFinish(List<AdvancedTimeLinkedList<Mechanizm>> sortedMultiData);
+        void onMultiTaskFinish(List<AdvancedDataLinkedList<Mechanizm>> sortedMultiData);
     }
 
     public class Builder {

@@ -1,11 +1,10 @@
 package com.example.yuriy.multithreadsorter.sortUtils;
 
 
-
 import com.example.yuriy.multithreadsorter.model.Mechanizm;
 
 
-public class MechanizmSorter extends BaseSortedClass<Mechanizm[]> {
+public class BubbleSort extends ComparableAbstractSort {
 
 
     @Override
@@ -16,7 +15,9 @@ public class MechanizmSorter extends BaseSortedClass<Mechanizm[]> {
         if (dataToSort.length <= 1) {
             return dataToSort;
         }
+        //switcher
         return doBubbleSort(dataToSort);
+//        return doQuickSort(dataToSort);
     }
 
     private Mechanizm[] doBubbleSort(Mechanizm[] dataToSort) {
@@ -36,10 +37,5 @@ public class MechanizmSorter extends BaseSortedClass<Mechanizm[]> {
         }
         return dataToSort;
     }
-
-    private boolean lexicographyCompare(Mechanizm first, Mechanizm second) {
-        return first.getName().compareTo(second.getName()) > 0;
-    }
-
 
 }

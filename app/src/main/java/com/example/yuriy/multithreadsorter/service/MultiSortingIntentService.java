@@ -8,7 +8,8 @@ import android.util.Log;
 
 import com.example.yuriy.multithreadsorter.Constants;
 import com.example.yuriy.multithreadsorter.model.Mechanizm;
-import com.example.yuriy.multithreadsorter.service.manager.AdvancedTimeLinkedList;
+import com.example.yuriy.multithreadsorter.prefferences.SharedPreferencesProvider;
+import com.example.yuriy.multithreadsorter.service.manager.AdvancedDataLinkedList;
 import com.example.yuriy.multithreadsorter.service.manager.ThreadManager;
 
 import java.io.Serializable;
@@ -44,13 +45,13 @@ public class MultiSortingIntentService extends IntentService implements ThreadMa
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
             Mechanizm[][] multiTaskList = (Mechanizm[][]) intent.getSerializableExtra(MULTI_TASK_EXTRA);
-
+            int selectedSortTypeMethod = new SharedPreferencesProvider().getSelectedSortType(getApplicationContext());
             ThreadManager.Builder builder = ThreadManager.newBuilder();
             ThreadManager manager = builder
                     .setMultiTask(multiTaskList)
                     .registerOnFinishCallback(this)
                     .build();
-            manager.executeMultiTask();
+            manager.executeMultiTask(selectedSortTypeMethod);
 
         }
     }
@@ -63,7 +64,7 @@ public class MultiSortingIntentService extends IntentService implements ThreadMa
     }
 
     @Override
-    public void onMultiTaskFinish(List<AdvancedTimeLinkedList<Mechanizm>> sortedMultiTaskData) {
+    public void onMultiTaskFinish(List<AdvancedDataLinkedList<Mechanizm>> sortedMultiTaskData) {
         Intent localIntent =
                 new Intent(Constants.BROADCAST_SORT_ACTION);
         Log.w("Service", "onMultiTaskFinish: data size = " + sortedMultiTaskData.size());
